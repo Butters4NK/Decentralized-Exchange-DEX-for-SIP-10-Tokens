@@ -33,3 +33,24 @@
         (reserve-y (get reserve-y pool))
     )
     
+     )
+        (asserts! (> liquidity 0) (err u2))
+        (asserts! (>= liquidity min-liquidity) (err u3))
+        (map-set pools pool-key {
+            reserve-x: (+ reserve-x amount-x),
+            reserve-y: (+ reserve-y amount-y),
+            liquidity: (+ total-liquidity liquidity)
+        })
+        (ok liquidity)
+        )
+    )
+))
+
+;; Swap tokens
+(define-public (swap-x-for-y (token-x principal) (token-y principal) (amount-in uint) (min-out uint))
+    (let (
+        (pool-key { token-x: token-x, token-y: token-y })
+        (pool (unwrap! (map-get? pools pool-key) (err u4)))
+        (reserve-x (get reserve-x pool))
+        (reserve-y (get reserve-y pool))
+        (amount-in-with-fee (* amount-in (- FEE_DENOMINATOR FEE_BP
