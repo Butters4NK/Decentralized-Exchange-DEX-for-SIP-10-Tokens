@@ -54,3 +54,17 @@
         (reserve-x (get reserve-x pool))
         (reserve-y (get reserve-y pool))
         (amount-in-with-fee (* amount-in (- FEE_DENOMINATOR FEE_BP
+        S)))
+    )
+    
+    ;; Transfer input tokens
+    (try! (contract-call? token-x transfer amount-in tx-sender (as-contract tx-sender)))
+    
+    ;; Calculate output
+    (let ((numerator (* amount-in-with-fee reserve-y)))
+        (denominator (+ (* reserve-x FEE_DENOMINATOR) amount-in-with-fee)))
+        (amount-out (/ numerator denominator))
+    )
+    
+    (asserts! (>= amount-out min-out) (err u5))
+    
